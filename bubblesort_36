@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Futuristic Bubble Sort Engine</title>
+  <style>
+    /* Reset & Cyberpunk Ambient Background */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 50%, #08090f 0%, #020204 100%);
+      color: #ffffff;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Aura Cahaya di Latar Belakang */
+    .nebula-1 {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255, 0, 127, 0.1) 0%, transparent 75%);
+      top: -20%;
+      left: -10%;
+      pointer-events: none;
+    }
+
+    .nebula-2 {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0, 245, 212, 0.08) 0%, transparent 75%);
+      bottom: -20%;
+      right: -10%;
+      pointer-events: none;
+    }
+
+    /* Kontainer Utama (Glassmorphic Core) */
+    .panel {
+      position: relative;
+      z-index: 10;
+      background: rgba(13, 14, 22, 0.65);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      border-radius: 28px;
+      box-shadow: 0 50px 100px rgba(0, 0, 0, 0.8);
+      width: 90%;
+      max-width: 800px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      text-align: center;
+      background: linear-gradient(45deg, #ff007f, #00f5d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 5px;
+    }
+
+    .sub-title {
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.4);
+      text-align: center;
+      margin-bottom: 40px;
+      letter-spacing: 1px;
+    }
+
+    /* Wadah Utama Penampung Batang Data */
+    .chart-area {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      height: 240px;
+      gap: 14px;
+      margin-bottom: 40px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Desain Dasar Batang Neon */
+    .bar {
+      width: 50px;
+      background: linear-gradient(180deg, #7928ca 0%, #2e1065 100%);
+      border-radius: 10px 10px 4px 4px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding-bottom: 15px;
+      font-family: 'Courier New', monospace;
+      font-weight: 800;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 0 15px rgba(121, 40, 202, 0.15);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* STATE ANIMASI WARNA BUBBLE SORT */
+    
+    /* 1. Batang yang sedang dibandingkan (Kuning Emas Berpijar) */
+    .bar.comparing {
+      background: linear-gradient(180deg, #fee440 0%, #f77f00 100%) !important;
+      box-shadow: 0 0 25px rgba(254, 228, 64, 0.6) !important;
+      color: #000000;
+      transform: scale(1.05);
+    }
+
+    /* 2. Batang yang posisinya sudah fix/kunci di kanan (Mint Neon) */
+    .bar.locked {
+      background: linear-gradient(180deg, #00f5d4 0%, #00bbf9 100%) !important;
+      box-shadow: 0 0 25px rgba(0, 245, 212, 0.4) !important;
+      color: #000000;
+    }
+
+    /* Panel Tombol Aksi */
+    .action-panel {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    button {
+      background: rgba(255, 255, 255, 0.02);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px 32px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    button.btn-prime {
+      background: linear-gradient(45deg, #ff007f, #7928ca);
+      border: none;
+      box-shadow: 0 4px 20px rgba(255, 0, 127, 0.3);
+    }
+
+    button.btn-prime:hover:not(:disabled) {
+      background: linear-gradient(45deg, #ff2a93, #8b3fd6);
+      box-shadow: 0 6px 25px rgba(255, 0, 127, 0.5);
+    }
+
+    button:disabled {
+      opacity: 0.2;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nebula-1"></div>
+  <div class="nebula-2"></div>
+
+  <div class="panel">
+    <h1>Bubble Sort Engine</h1>
+    <div class="sub-title">CONSOLE: Mengapungkan Nilai Terbesar Melalui Komparasi Berdampingan</div>
+
+    <!-- Grafik Batang -->
+    <div class="chart-area" id="chartBox"></div>
+
+    <!-- Tombol Kendali -->
+    <div class="action-panel">
+      <button onclick="pembangkitDataAcak()" id="btnReset">Acak Struktur</button>
+      <button class="btn-prime" onclick="eksekusiBubbleSort()" id="btnSort">Mulai Urutkan</button>
+    </div>
+  </div>
+
+  <script>
+    const chartBox = document.getElementById("chartBox");
+    // Array berisi 8 elemen agar muat sempurna dan estetik di layar desktop maupun tablet
+    let masterData = [48, 18, 62, 30, 12, 55, 38, 25];
+    let barElements = [];
+
+    // Menggubah data angka menjadi elemen HTML visual batang
+    function renderChart() {
+      chartBox.innerHTML = "";
+      barElements = [];
+      masterData.forEach(nilai => {
+        const batang = document.createElement("div");
+        batang.classList.add("bar");
+        // Mengalikan nilai dengan 3.2 agar tingginya pas memenuhi area chart
+        batang.style.height = `${nilai * 3.2}px`; 
+        batang.innerText = nilai;
+        chartBox.appendChild(batang);
+        barElements.push(batang);
+      });
+    }
+
+    // Mengacak data baru dengan rentang nilai 10 - 70
+    function pembangkitDataAcak() {
+      masterData = Array.from({ length: 8 }, () => Math.floor(Math.random() * 60) + 10);
+      renderChart();
+      kunciInteraksi(true);
+    }
+
+    // Fungsi pembantu penahan waktu jeda (delay) animasi
+    function delayMiliDetik(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Inti Algoritma Animasi Bubble Sort
+    async function eksekusiBubbleSort() {
+      kunciInteraksi(false);
+      let n = masterData.length;
+
+      // Iterasi berulang sebanyak jumlah baris data
+      for (let i = 0; i < n - 1; i++) {
+        for (let j = 0; j < n - i - 1; j++) {
+          
+          // Aktifkan warna komparasi (Kuning) untuk dua elemen yang bertetangga
+          barElements[j].classList.add("comparing");
+          barElements[j + 1].classList.add("comparing");
+          
+          // Beri jeda 400ms agar mata pengguna bisa mendeteksi proses pengecekan
+          await delayMiliDetik(400);
+
+          // Jika elemen kiri lebih besar dari elemen kanan, lakukan SWAP (Tukar posisi)
+          if (masterData[j] > masterData[j + 1]) {
+            let wadahSementara = masterData[j];
+            masterData[j] = masterData[j + 1];
+            masterData[j + 1] = wadahSementara;
+
+            // Update tinggi batang dan teks angka secara real-time di layar
+            barElements[j].style.height = `${masterData[j] * 3.2}px`;
+            barElements[j].innerText = masterData[j];
+            
+            barElements[j + 1].style.height = `${masterData[j + 1] * 3.2}px`;
+            barElements[j + 1].innerText = masterData[j + 1];
+          }
+
+          // Matikan warna komparasi setelah selesai dibandingkan
+          barElements[j].classList.remove("comparing");
+          barElements[j + 1].classList.remove("comparing");
+        }
+
+        // Di akhir setiap putaran luar, elemen paling besar otomatis terdorong ke ujung kanan.
+        // Warnai dengan Hijau Mint (Locked) karena posisinya sudah fix.
+        barElements[n - i - 1].classList.add("locked");
+      }
+
+      // Elemen indeks ke-0 otomatis berada di urutan paling benar di akhir proses
+      barElements[0].classList.add("locked");
+      document.getElementById("btnReset").disabled = false;
+    }
+
+    function kunciInteraksi(status) {
+      document.getElementById("btnSort").disabled = !status;
+      document.getElementById("btnReset").disabled = !status;
+    }
+
+    // Inisialisasi penampilan perdana jam web dimuat
+    renderChart();
+  </script>
+
+</body>
+</html>
